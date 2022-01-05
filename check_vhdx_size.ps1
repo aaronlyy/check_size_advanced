@@ -57,13 +57,13 @@ if ($File -Ne $null -And $File -Ne ""){
     # check if size -Ne $null to validate success
     if ($sizeGb -Ne $null){
         # check size against limit
-        if ($sizeGb -Ge $warningGb){
-            # limit is greater or equal to limitGb, add path and warning
-            $results[$File] = "$Warning usage exceeded! ($sizeGb/$max)"
-        }
-        elseif ($sizeGb -Ge $Max){
+        if ($sizeGb -Ge $Max){
             # size is -Ge to Disk, add path and critical to table
             $results[$File] = "100% usage! ($sizeGb/$max)"
+        }
+        elseif ($sizeGb -Ge $warningGb){
+            # limit is greater or equal to limitGb, add path and warning
+            $results[$File] = "$Warning usage exceeded! ($sizeGb/$max)"
         }
         else {
             # everytings fine, add path and ok to table
