@@ -1,7 +1,6 @@
 # script to check the size of vhdx disks and get the corresponding name
 # can be used with single file or complete directory
 
-
 Param(
     [Parameter(HelpMessage="Absolute path to a single vhdx disk")]
     [Alias("f")]
@@ -13,12 +12,12 @@ Param(
     [String]
     $Directory = $null,
 
-    [Parameter(HelpMessage="Max disk size in Gb")]
+    [Parameter(Mandatory, HelpMessage="Max disk size in Gb")]
     [Alias("m")]
-    [Int]
+    [Float]
     $Max,
 
-    [Parameter(Mandatory, HelpMessage="Warning space limit as % (0.5, 0.95, etc.)")]
+    [Parameter(HelpMessage="Warning space limit as % (0.5, 0.95, etc.)")]
     [Alias("w")]
     [Float]
     $Warning = 0.95
@@ -47,32 +46,28 @@ function Get-Size {
     }
 }
 
-
 $results = @{}
 $code = 0
 $warningGb = $Max * $Warning
-
-Write-Host $File
 
 if ($File -Ne $null -And $File -Ne ""){
     # passed parameter is a single file
     # get file size in gb
     $sizeGb = Get-Size $File
-    Write-Host $sizeGb
     # check if size -Ne $null to validate success
     if ($sizeGb -Ne $null){
         # check size against limit
-        if ($sizGb -Ge $WarningGb){
+        if ($sizeGb -Ge $warningGb){
             # limit is greater or equal to limitGb, add path and warning
-            $results[$File] = "$Warning usage exceeded! ($sizeGb)"
+            $results[$File] = "$Warning usage exceeded! ($sizeGb/$max)"
         }
         elseif ($sizeGb -Ge $Max){
             # size is -Ge to Disk, add path and critical to table
-            $results[$File] = "100% usage! ($sizeGb)"
+            $results[$File] = "100% usage! ($sizeGb/$max)"
         }
         else {
             # everytings fine, add path and ok to table
-            $results[$File] = "Ok ($size)"
+            $results[$File] = "Ok ($sizeGb/$max)"
         }
     }
     else {
@@ -91,5 +86,6 @@ else {
     $code = -1
 }
 
-Write-Host $results[$File]
+$str = $results | Out-String
+Write-Host $str -ForegroundColor Green
 return $code
