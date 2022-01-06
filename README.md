@@ -1,7 +1,6 @@
 # check_vhdx_size
 
-Powershell script to check the size of a single or a directory of .vhdx disks.
-Made for use with icinga/nagios/nsclient++.
+Powershell script to check the size of a single or a directory of .vhdx disks. Made for use with Icinga2/NSClient++.
 
 ## Examples
 
