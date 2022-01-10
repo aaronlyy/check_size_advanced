@@ -26,6 +26,17 @@ Criticals and warnings will be output.
 .\check_vhdx_size.ps1 -p "D:\disks\" -m 20 -w 0.8
 ```
 
+## TODO
+
+- Add parameter indexing
+- Add custom file support
+- Add logging
+- Recode the exit procedure
+- Add file count to output
+- Add parameter to specify exit codes for ok, warning, critical
+- Add parameter to enable output
+- Add parameter to enable logging
+
 ## About
 
 Made with ♥ by [aaronlyy](https://github.com/aaronlyy)
