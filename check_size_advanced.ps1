@@ -223,8 +223,6 @@ if ($resUnk.Count -Gt 0){
     }
 }
 
-
 Write-Host $output
-
 
 exit($code)
