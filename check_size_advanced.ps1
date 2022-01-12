@@ -1,12 +1,10 @@
 # script to check the size of single files or files in folders
 
 # TODO
-#* function to get size of file
 # function to get size of folder
-#* function to get size of multiple files
-
 # function to get the username from an sid
 # functiont to get the sid out of an vhdx filename
+
 
 # --- PARAMETER ---
 Param(
@@ -14,12 +12,6 @@ Param(
     [Alias("p")]
     [String]
     $Path,
-
-    [Parameter(HelpMessage="Check mode. (single, multi, dir), default: single")]
-    [Alias("m")]
-    [ValidateSet("file", "folder", "absfolder")]
-    [String]
-    $Mode = "file",
 
     [Parameter(HelpMessage="File extension filter. Use with -m 'multi' to check only specific types of files.")]
     [Alias("f")]
@@ -47,6 +39,7 @@ Param(
     [Switch]
     $Vhdx
 )
+
 
 #* ------ FUNCTIONS ------
 function Get-Size {
@@ -84,6 +77,7 @@ function Get-Size {
     }
 }
 
+
 function Get-DirectorySize {
     # returns size of a folder
     Param(
@@ -102,6 +96,7 @@ function Get-DirectorySize {
     # needs to be implemented
 
 }
+
 
 function Get-MultipleSize {
     # returns a hashtable with abspath: size
@@ -150,58 +145,45 @@ $resWarn = @{}
 $resCrit = @{}
 $resUnk = @{}
 
-# modes
-if ($Mode -Eq "file"){
-    # get size of single file in given size mode
-    if (Test-Path $Path -PathType leaf){
-        $size = Get-Size -File $Path -Bytes $Bytes
+# file or folder
+if (Test-Path $Path -PathType leaf){
+    $size = Get-Size -File $Path -Bytes $Bytes
+    if ($size -Ne $null){
+        if ($size -Ge $CriticalSize){
+                $resCrit.Add($Path, $size)
+        }
+        elseif ($size -Ge $warningSize){
+            $resWarn.Add($Path, $size)
+        }
+        else {
+            $resOk.Add($Path, $size)
+        }
+    }
+    else {
+        $resUnk.Add($Path, $size)
+    }
+}
+elseif (Test-Path $Path -PathType Container){
+    $paths = Get-ChildItem $Path -Filter $Filter | ForEach { $_.FullName } # get all files of path
+    foreach ($p in $paths){
+        $size = Get-Size -File $p -Bytes $Bytes
         if ($size -Ne $null){
             if ($size -Ge $CriticalSize){
-                    $resCrit.Add($Path, $size)
+                $resCrit.Add($p, $size)
             }
             elseif ($size -Ge $warningSize){
-                $resWarn.Add($Path, $size)
+                $resWarn.Add($p, $size)
             }
             else {
-                $resOk.Add($Path, $size)
+                $resOk.Add($p, $size)
             }
         }
         else {
-            $resUnk.Add($Path, $size)
+            $resUnk.Add($p, $size)
         }
     }
-    else {
-        $resUnk.Add($Path, "Mode is file but given path is a folder!")
-    }
 }
-elseif ($Mode -Eq "folder"){
-    if (Test-Path $Path -PathType Container){
-        $paths = Get-ChildItem $Path -Filter $Filter | ForEach { $_.FullName } # get all files of path
-        foreach ($p in $paths){
-            $size = Get-Size -File $p -Bytes $Bytes
-            if ($size -Ne $null){
-                if ($size -Ge $CriticalSize){
-                    $resCrit.Add($p, $size)
-                }
-                elseif ($size -Ge $warningSize){
-                    $resWarn.Add($p, $size)
-                }
-                else {
-                    $resOk.Add($p, $size)
-                }
-            }
-            else {
-                $resUnk.Add($p, $size)
-            }
-        }
-    }
-    else {
-        $resUnk.Add($Path, "Mode is folder but given path is a file!")
-    }
-}
-else {
-    #! check absolute directory size
-}
+
 
 # set exit code
 if ($resCrit.Count -Gt 0){
@@ -216,6 +198,7 @@ elseif ($resUnk.Count -Gt 0){
 else {
     $code = $codeOk
 }
+
 
 # build output
 $output = "Critical: {0}`n" -f $resCrit.Count
@@ -240,6 +223,8 @@ if ($resUnk.Count -Gt 0){
     }
 }
 
+
 Write-Host $output
+
 
 exit($code)
