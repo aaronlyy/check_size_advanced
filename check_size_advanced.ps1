@@ -222,20 +222,21 @@ $output = "Critical: {0}`n" -f $resCrit.Count
 $output += "Warning: {0}`n" -f $resWarn.Count
 $output += "Unknown: {0}`n" -f $resUnk.Count
 $output += "Ok: {0}`n" -f $resOk.Count
+$output += "Sizes are shown in {0}.`n" -f $Bytes
 
 if ($resCrit.Count -Gt 0){
     foreach ($r in $resCrit.getEnumerator()){
-        $output += "[Critical] {0}: {1}`n" -f $r.Name, $r.Value
+        $output += "`n[Critical] {0}: {1}" -f $r.Name, $r.Value
     }
 }
 if ($resWarn.Count -Gt 0){
     foreach ($r in $resWarn.getEnumerator()){
-        $output += "[Warning] {0}: {1}`n" -f $r.Name, $r.Value
+        $output += "`n[Warning] {0}: {1}" -f $r.Name, $r.Value
     }
 }
 if ($resUnk.Count -Gt 0){
     foreach ($r in $resUnk.getEnumerator()){
-        $output += "[Unknown] {0}: {1}`n" -f $r.Name, $r.Value
+        $output += "`n[Unknown] {0}: {1}" -f $r.Name, $r.Value
     }
 }
 
